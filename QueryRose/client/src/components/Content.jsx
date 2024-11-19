@@ -1,67 +1,78 @@
-import { useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import Drawer from "./Drawer";
 import { useEffect } from "react";
-import { dataCmds } from "../constant/data/commands";
 import { API } from "../libs/API";
-import createConnectionMysql from "../helpers/createConnection";
 import { convertToUpperCase } from "../helpers/convertToUppercase";
+import { Context } from "../context/useContext";
 
 export default function Content() {
+  const textareaRef = useRef(null);
+  const [state, dispatch] = useContext(Context);
   const [query, setQuery] = useState("");
   const [result, setResult] = useState([]);
 
   const onChange = (e) => {
+    const textarea = textareaRef.current;
+    const cursorStart = textarea.selectionStart;
+    const cursorEnd = textarea.selectionEnd;
     const text = e.target.value;
-    setQuery(text);
+    setQuery(convertToUpperCase(text));
+    setTimeout(() => {
+      textarea.setSelectionRange(cursorStart, cursorEnd);
+    }, 0);
   };
 
-  const getResultQuery = async () => {
-    const data = await API.post("/query", {
-      query,
-    });
-    setResult(data.data.result);
-  };
+  const getResultQuery = useCallback(
+    async () => {
+      if (state.isPlayground) {
+        const data = await API.post("/query", {
+          query,
+        });
+        setResult(data.data.result);
+        dispatch({
+          type: "PLAYGROUND",
+          payload: false,
+        });
+      }
+      if (state.isClickTable) {
+        setResult(state.dataTable);
+        dispatch({
+          type: "CLICK_OFF",
+        });
+      }
+    },
+    [dispatch, query, state.dataTable, state.isClickTable, state.isPlayground]
+  );
 
-  const handleKeyPress = async (e, query) => {
-    console.log(`Key pressed: ${e.key}`, query);
-    if (e.key === "F9") {
-      await getResultQuery();
-    }
-  };
+  const handleKeyPress = useCallback(
+    async (e) => {
+      // console.log(`Key pressed: ${e.key}`, query);
+      if (e.key === "F9") {
+        dispatch({
+          type: "PLAYGROUND",
+          payload: true,
+        });
+      }
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
-    const commands = [];
-
-    const split = query.toLowerCase().split(" ");
-    for (const item of split) {
-      const dataCmd = dataCmds.filter(
-        (x) =>
-          x.name === item.toLowerCase() &&
-          (x.status === "CMD VANILLA" || x.status === "FUNCTION")
-      );
-      console.log(convertToUpperCase(item));
-      commands.push(dataCmd[0]?.cmd ? convertToUpperCase(item) : item);
-    }
-
-    const querySet = commands.join().replace(/,/gm, " ");
-    setQuery(convertToUpperCase(query));
+    getResultQuery();
     // attach the event listener
-    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener("keydown", (e) => handleKeyPress(e, query));
 
     // remove the event listener
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener("keydown", (e) => handleKeyPress(e, query));
     };
-  }, [query]);
+  }, [getResultQuery, handleKeyPress, query]);
 
   const handleCreateConnection = () => {
-    const getFileName = createConnectionMysql({
-      host: "localhost",
-      user: "test",
-      dbName: "testing",
-    });
-    console.log(getFileName);
+    API.get("/connection/create");
   };
+
+  console.log(result);
 
   return (
     <div className="p-4 w-full h-fit">
@@ -88,6 +99,7 @@ export default function Content() {
       <div className="relative border-2 border-gray-200 border-dashed rounded-lg">
         <textarea
           value={query}
+          ref={textareaRef}
           onChange={onChange}
           className="p-4 text-xl font-semibold h-[475px] w-full focus:ring-0 border-none outline-0"
           name=""

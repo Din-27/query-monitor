@@ -48,60 +48,67 @@ export default function Drawer({ result }) {
       {state.isDrawer && (
         <div className="bg-red-200 max-w-screen h-64 overflow-auto">
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                  <th scope="col" className="p-4">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-all-search"
-                        type="checkbox"
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="checkbox-all-search" className="sr-only">
-                        checkbox
-                      </label>
-                    </div>
-                  </th>
-                  {header.map((x, y) => (
-                    <th key={y} scope="col" className="px-6 py-3">
-                      {x}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              {result.map((x, y) => (
-                <tbody key={y}>
-                  <tr className="bg-white border-b">
-                    <td className="w-4 p-4">
+            {result.length > 0 ? (
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-200">
+                  <tr>
+                    <th scope="col" className="p-4">
                       <div className="flex items-center">
                         <input
-                          id="checkbox-table-search-1"
+                          id="checkbox-all-search"
                           type="checkbox"
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                         />
                         <label
-                          htmlFor="checkbox-table-search-1"
+                          htmlFor="checkbox-all-search"
                           className="sr-only"
                         >
                           checkbox
                         </label>
                       </div>
-                    </td>
-
-                    {header.map((item, idx) => (
-                      <th
-                        key={idx}
-                        scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        {x[item]}
+                    </th>
+                    {header.map((x, y) => (
+                      <th key={y} scope="col" className="px-6 py-3">
+                        {x}
                       </th>
                     ))}
                   </tr>
-                </tbody>
-              ))}
-            </table>
+                </thead>
+                {result.map((x, y) => (
+                  <tbody key={y}>
+                    <tr className="bg-white border-b">
+                      <td className="w-4 p-4">
+                        <div className="flex items-center">
+                          <input
+                            id="checkbox-table-search-1"
+                            type="checkbox"
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor="checkbox-table-search-1"
+                            className="sr-only"
+                          >
+                            checkbox
+                          </label>
+                        </div>
+                      </td>
+
+                      {header.map((item, idx) => (
+                        <th
+                          key={idx}
+                          scope="row"
+                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                        >
+                          {x[item]}
+                        </th>
+                      ))}
+                    </tr>
+                  </tbody>
+                ))}
+              </table>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       )}

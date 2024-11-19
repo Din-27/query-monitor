@@ -1,20 +1,51 @@
-import React from "react";
+import React, { useContext } from "react";
 import Accordion from "../Accordion";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { API } from "../../libs/API";
 import { useState } from "react";
+import { Context } from "../../context/useContext";
 
 export default function ListTables({ dbName, nama, unique, icon }) {
+  const [_, dispatch] = useContext(Context);
   const [databaseProps, setDatabaseProps] = useState([]);
 
-  const getDatabasePropeties = async (name) => {
-    const databases = await API.get("/" + name + "/" + dbName || null);
-    setDatabaseProps(databases.data.result);
-    return databases.data.result;
+  const getDatabasePropeties = useCallback(
+    async (name) => {
+      const databases = await API.get(
+        "/database/" + name + "/" + dbName || null
+      );
+      setDatabaseProps(databases.data.result);
+      return databases.data.result;
+    },
+    [dbName]
+  );
+
+  const handleGetDataTableAndView = async (tableName, unique) => {
+    console.log(_);
+
+    if (unique === "Tables") {
+      const { data } = await API.post("/query/click-table", { tableName });
+      dispatch({
+        type: "CLICK_TABLE",
+        payload: data.result,
+      });
+      dispatch({
+        type: "PLAYGROUND",
+        payload: false,
+      });
+    }
+    if (unique === "Views") {
+      const { data } = await API.post("/query/click-table", { tableName });
+      dispatch({
+        type: "CLICK_TABLE",
+        payload: data.result,
+      });
+    }
   };
+
   useEffect(() => {
     getDatabasePropeties(unique);
-  }, []);
+  }, [getDatabasePropeties, unique]);
 
   return (
     <div className="mt-2 py-1">
@@ -22,6 +53,7 @@ export default function ListTables({ dbName, nama, unique, icon }) {
         {databaseProps.map((item, index) => (
           <li
             key={index}
+            onClick={() => handleGetDataTableAndView(item.name, nama)}
             className="pl-8 cursor-default text-gray-900 transition hover:bg-gray-200 py-1 mt-1"
           >
             {/* <span className="transition group-open:-rotate-180"> */}

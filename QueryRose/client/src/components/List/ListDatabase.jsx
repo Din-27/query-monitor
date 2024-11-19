@@ -4,20 +4,20 @@ import { databaseProperties } from "../../constant/data/database";
 import ListTables from "./ListTables";
 import IconDatabase from "../../assets/database.svg";
 import { API } from "../../libs/API";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useEffect } from "react";
 
 export default function ListDatabase() {
   const [databases, setDatabases] = useState([]);
 
-  const getDatabases = async () => {
+  const getDatabases = useCallback(async () => {
     const databases = await API.get("/database");
     setDatabases(databases.data.result);
-  };
+  }, []);
 
   useEffect(() => {
     getDatabases();
-  }, []);
+  }, [getDatabases]);
   // console.log(databaseProps);
 
   return (

@@ -12,7 +12,7 @@ import { dataEvents } from './events'
 export const databaseProperties = [
     { key: "tables", nama: "Tables", icon: IconTables, data: dataTables },
     { key: "views", nama: "Views", icon: IconEyeglass2, data: dataViews },
-    { key: "stored-procedure", nama: "Stored Procs", icon: IconSettings, data: dataStoreProcs },
+    { key: "stored-procedures", nama: "Stored Procs", icon: IconSettings, data: dataStoreProcs },
     { key: "triggers", nama: "Triggers", icon: IconBolt, data: dataTriggers },
     { key: "events", nama: "Events", icon: IconClockHour4, data: dataEvents },
 ];
